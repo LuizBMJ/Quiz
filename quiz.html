@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Você realmente se conhece?</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=Nunito:wght@400;600;700;800&display=swap');
+
+  :root{
+    --bg-1: #fbeef2;
+    --bg-2: #f3e3f5;
+    --card: #ffffff;
+    --ink: #4a2f42;
+    --ink-soft: #8a6b7d;
+    --pink: #e78ca3;
+    --pink-deep: #d1668a;
+    --lilac: #b98fd1;
+    --gold: #e3b04b;
+    --wrong: #c96b7a;
+    --shadow: 0 20px 45px -20px rgba(148, 76, 110, 0.35);
+  }
+
+  *{ box-sizing: border-box; }
+
+  html, body{
+    margin:0;
+    padding:0;
+    min-height:100vh;
+  }
+
+  body{
+    font-family: 'Nunito', sans-serif;
+    color: var(--ink);
+    background:
+      radial-gradient(circle at 15% 10%, #fff5f8 0%, transparent 45%),
+      radial-gradient(circle at 85% 90%, #f6e6fb 0%, transparent 50%),
+      linear-gradient(160deg, var(--bg-1), var(--bg-2));
+    min-height: 100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding: 24px;
+    overflow-x:hidden;
+  }
+
+  .stage{
+    width:100%;
+    max-width: 480px;
+    position:relative;
+  }
+
+  .card{
+    background: var(--card);
+    border-radius: 28px;
+    padding: 44px 32px 36px;
+    box-shadow: var(--shadow);
+    position:relative;
+    overflow:hidden;
+    animation: rise .5s ease both;
+  }
+
+  .card::before{
+    content:"";
+    position:absolute;
+    top:-60px; right:-60px;
+    width:160px; height:160px;
+    background: radial-gradient(circle, rgba(231,140,163,.25), transparent 70%);
+    border-radius:50%;
+  }
+
+  @keyframes rise{
+    from{ opacity:0; transform: translateY(14px); }
+    to{ opacity:1; transform: translateY(0); }
+  }
+
+  .eyebrow{
+    font-size: 13px;
+    color: var(--ink-soft);
+    letter-spacing: .04em;
+    margin-bottom: 6px;
+  }
+
+  h1{
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+    font-size: 30px;
+    line-height: 1.25;
+    margin: 0 0 12px;
+    color: var(--ink);
+  }
+
+  h1 em{
+    font-style: italic;
+    color: var(--pink-deep);
+  }
+
+  p.sub{
+    font-size: 15px;
+    color: var(--ink-soft);
+    line-height: 1.5;
+    margin: 0 0 28px;
+  }
+
+  .hint{
+    font-size: 13px;
+    color: var(--lilac);
+    font-style: italic;
+    margin: -14px 0 20px;
+  }
+
+  .options{
+    display:flex;
+    flex-direction:column;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+
+  .option{
+    text-align:left;
+    border: 1.5px solid #f0dbe4;
+    background: #fffafc;
+    color: var(--ink);
+    border-radius: 16px;
+    padding: 15px 18px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 15.5px;
+    font-weight: 600;
+    cursor:pointer;
+    transition: border-color .18s ease, transform .12s ease, background .18s ease;
+  }
+
+  .option:hover{
+    border-color: var(--pink);
+    background: #fff3f6;
+    transform: translateY(-1px);
+  }
+
+  .option:active{
+    transform: translateY(0px) scale(.99);
+  }
+
+  .option.locked{
+    pointer-events:none;
+  }
+
+  .option.correct-flash{
+    background: #fdf0d8;
+    border-color: var(--gold);
+  }
+
+  .option.wrong-flash{
+    background: #f7dde1;
+    border-color: var(--wrong);
+    animation: shake .35s ease;
+  }
+
+  @keyframes shake{
+    0%,100%{ transform: translateX(0); }
+    25%{ transform: translateX(-6px); }
+    75%{ transform: translateX(6px); }
+  }
+
+  .btn-main{
+    width:100%;
+    margin-top: 6px;
+    background: linear-gradient(135deg, var(--pink), var(--pink-deep));
+    color: #fff;
+    border:none;
+    border-radius: 16px;
+    padding: 16px 20px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 16px;
+    font-weight: 800;
+    cursor:pointer;
+    box-shadow: 0 12px 24px -10px rgba(209,102,138,.65);
+    transition: transform .12s ease, box-shadow .12s ease;
+  }
+
+  .btn-main:hover{ transform: translateY(-2px); }
+  .btn-main:active{ transform: translateY(0); }
+
+  .progress-track{
+    height: 6px;
+    border-radius: 999px;
+    background: #f2dfe6;
+    margin-bottom: 26px;
+    overflow:hidden;
+  }
+
+  .progress-fill{
+    height:100%;
+    border-radius:999px;
+    background: linear-gradient(90deg, var(--pink), var(--lilac));
+    transition: width .35s ease;
+  }
+
+  .step-label{
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    font-weight:700;
+    letter-spacing:.02em;
+    margin-bottom: 10px;
+  }
+
+  /* ---- START SCREEN ---- */
+  .start-icon{
+    font-size: 42px;
+    margin-bottom: 14px;
+    display:block;
+  }
+
+  /* ---- RESULT SCREEN ---- */
+  .score-big{
+    font-family:'Playfair Display', serif;
+    font-size: 54px;
+    color: var(--pink-deep);
+    margin: 6px 0 2px;
+  }
+
+  .score-caption{
+    font-size: 14px;
+    color: var(--ink-soft);
+    margin-bottom: 22px;
+  }
+
+  /* ---- JUMPSCARE ---- */
+  .jumpscare-overlay{
+    position: fixed;
+    inset: 0;
+    background: #000;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+    z-index: 999;
+    text-align:center;
+    padding: 20px;
+  }
+
+  .jumpscare-overlay.show{
+    display:flex;
+  }
+
+  .ghost-slot{
+    max-width: 100%;
+    max-height: 100vh;
+    width: auto;
+    height: auto;
+    object-fit: cover;
+    animation: scarepop .28s ease;
+  }
+
+  @keyframes scarepop{
+    0%{ transform: scale(1.5); opacity:0; }
+    100%{ transform: scale(1); opacity:1; }
+  }
+
+  /* ---- FINAL PRIZE OVERLAY ---- */
+  .final-overlay{
+    position: fixed;
+    inset:0;
+    background: rgba(20, 8, 16, 0.88);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index: 998;
+    padding: 40px 28px;
+    text-align:center;
+  }
+
+  .final-overlay.show{
+    display:flex;
+    animation: fadein .25s ease;
+  }
+
+  @keyframes fadein{
+    from{ opacity:0; }
+    to{ opacity:1; }
+  }
+
+  .final-text{
+    font-family:'Playfair Display', serif;
+    font-style: italic;
+    font-weight:600;
+    font-size: clamp(26px, 6vw, 38px);
+    color: #ffe3ec;
+    line-height:1.4;
+    max-width: 420px;
+  }
+
+  .card.dimmed{
+    filter: blur(2px) brightness(.6);
+  }
+
+  footer.tiny{
+    text-align:center;
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    margin-top: 18px;
+    opacity: .8;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="stage">
+  <div class="card" id="card">
+    <!-- content injected by JS -->
+  </div>
+  <footer class="tiny" id="footerNote">feito por alguém que presta atenção em você.</footer>
+</div>
+
+<div class="jumpscare-overlay" id="jumpscareOverlay">
+  <img src="assets/ghost.gif" class="ghost-slot" id="ghostSlot" alt="">
+</div>
+
+<div class="final-overlay" id="finalOverlay">
+  <div class="final-text">Eu sou suportável, então não vai ter nenhum prêmio, vacilona.</div>
+</div>
+
+<audio id="screamAudio" preload="auto">
+  <source src="assets/scream.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+// ============ DADOS DO QUIZ ============
+const questions = [
+  {
+    step: "01/7",
+    title: "Qual é a sua cor?",
+    options: ["Rosa", "Azul", "Roxo", "Branco"],
+    correct: [0],
+    mode: "single-correct" // só uma opção certa, demais dão errado (mas sem jumpscare)
+  },
+  {
+    step: "02/7",
+    title: "Escolha uma flor.",
+    hint: "dica: existe uma resposta muito óbvia aqui.",
+    options: ["Lírios do vale", "Rosas", "Girassol", "Cerejeira"],
+    correct: [0],
+    mode: "single-correct"
+  },
+  {
+    step: "03/7",
+    title: "Noite de filme. Qual?",
+    note: "(sim, essa pergunta é séria.)",
+    options: [
+      "Como Perder um Homem em 10 Dias",
+      "10 Coisas que Eu Odeio em Você",
+      "Diário de uma Paixão",
+      "Diário de uma Princesa 2",
+      "500 Dias com Ela",
+      "A Nova Cinderela"
+    ],
+    correct: [0,1,2,3,4,5],
+    mode: "all-correct" // qualquer opção conta como certa
+  },
+  {
+    step: "04/7",
+    title: "Qual série você maratona sem parar?",
+    options: ["Supernatural", "Anne com E"],
+    correct: [],
+    mode: "all-wrong" // nenhuma conta como certa, é easter egg
+  },
+  {
+    step: "05/7",
+    title: "Escolha um livro pra reler pela centésima vez.",
+    options: ["Príncipe Cruel (a coleção)", "Era uma Vez um Coração Partido", "Teoricamente Amor", "Entre Sombras e Espinhos"],
+    correct: [],
+    mode: "all-wrong"
+  },
+  {
+    step: "06/7",
+    title: "Você está estressada. E agora?",
+    note: "(eu me recuso a aceitar outra.)",
+    options: ["Ficar sozinha", "Comer alguma coisa", "Reclamar de tudo", "Alguém me fazer rir"],
+    correct: [3],
+    mode: "jumpscare" // errar aqui = jumpscare
+  }
+];
+
+const prizeOptions = ["Receber carinho", "Ouvir sua música favorita", "Reclamar comigo", "Ganhar um beijo"];
+
+// ============ ESTADO ============
+let currentIndex = 0;
+let score = 0;
+const totalScoredQuestions = questions.filter(q => q.mode !== "all-correct" || true).length; // conta todas as 6
+
+const card = document.getElementById("card");
+const jumpscareOverlay = document.getElementById("jumpscareOverlay");
+const finalOverlay = document.getElementById("finalOverlay");
+const screamAudio = document.getElementById("screamAudio");
+
+// ============ TELA INICIAL ============
+function renderStart(){
+  card.innerHTML = `
+    <span class="start-icon">🤍</span>
+    <h1>Você <em>realmente</em><br>se conhece?</h1>
+    <p class="sub">um quiz extremamente importante</p>
+    <button class="btn-main" id="startBtn">Começar →</button>
+  `;
+  document.getElementById("startBtn").onclick = () => {
+    currentIndex = 0;
+    score = 0;
+    renderQuestion();
+  };
+}
+
+// ============ TELA DE PERGUNTA ============
+function renderQuestion(){
+  const q = questions[currentIndex];
+  const progressPct = Math.round((currentIndex / questions.length) * 100);
+
+  card.innerHTML = `
+    <div class="step-label">QUIZ • ${q.step}</div>
+    <div class="progress-track"><div class="progress-fill" style="width:${progressPct}%"></div></div>
+    <h1>${q.title}</h1>
+    ${q.note ? `<p class="hint">${q.note}</p>` : ""}
+    ${q.hint ? `<p class="hint">${q.hint}</p>` : ""}
+    <div class="options" id="optionsWrap"></div>
+  `;
+
+  const wrap = document.getElementById("optionsWrap");
+  q.options.forEach((label, idx) => {
+    const btn = document.createElement("button");
+    btn.className = "option";
+    btn.textContent = label;
+    btn.onclick = () => handleAnswer(idx, btn, q);
+    wrap.appendChild(btn);
+  });
+}
+
+function handleAnswer(idx, btnEl, q){
+  const allBtns = document.querySelectorAll("#optionsWrap .option");
+  allBtns.forEach(b => b.classList.add("locked"));
+
+  const isCorrect = q.mode === "all-correct" ? true :
+                     q.mode === "all-wrong" ? false :
+                     q.correct.includes(idx);
+
+  if (q.mode === "jumpscare" && !isCorrect){
+    btnEl.classList.add("wrong-flash");
+    setTimeout(() => triggerJumpscare(q), 380);
+    return;
+  }
+
+  if (isCorrect){
+    btnEl.classList.add("correct-flash");
+    score++;
+  } else {
+    btnEl.classList.add("wrong-flash");
+  }
+
+  setTimeout(() => advance(), 550);
+}
+
+function triggerJumpscare(q){
+  jumpscareOverlay.classList.add("show");
+  try { screamAudio.currentTime = 0; screamAudio.play().catch(()=>{}); } catch(e){}
+
+  setTimeout(() => {
+    jumpscareOverlay.classList.remove("show");
+    try { screamAudio.pause(); screamAudio.currentTime = 0; } catch(e){}
+    renderQuestion(); // volta pra mesma pergunta (currentIndex não mudou)
+  }, 3000);
+}
+
+function advance(){
+  currentIndex++;
+  if (currentIndex < questions.length){
+    renderQuestion();
+  } else {
+    renderResult();
+  }
+}
+
+// ============ TELA DE RESULTADO ============
+function renderResult(){
+  card.innerHTML = `
+    <div class="step-label">RESULTADO</div>
+    <div class="score-big">${score} / ${questions.length}</div>
+    <p class="score-caption">${resultCaption(score, questions.length)}</p>
+    <h1 style="font-size:22px;">Mas tem um pequeno problema...</h1>
+    <p class="sub">Esse quiz nunca foi sobre descobrir quem você é.<br>Eu já sabia. 🤍</p>
+    <button class="btn-main" id="continueBtn">Continuar →</button>
+  `;
+  document.getElementById("continueBtn").onclick = renderPrize;
+}
+
+function resultCaption(score, total){
+  const pct = score / total;
+  if (pct >= 0.8) return "quase perfeita. quase.";
+  if (pct >= 0.5) return "deu pra ver que você tentou.";
+  return "ok, isso foi decepcionante. mas vai por outro motivo além do quiz.";
+}
+
+// ============ TELA DE PRÊMIO FINAL ============
+function renderPrize(){
+  card.innerHTML = `
+    <div class="step-label">QUIZ • FINAL/7</div>
+    <h1>Escolha o seu prêmio.</h1>
+    <div class="options" id="prizeWrap"></div>
+    <p class="hint" style="margin-top:14px;">qualquer uma das opções é válida.</p>
+  `;
+  const wrap = document.getElementById("prizeWrap");
+  prizeOptions.forEach(label => {
+    const btn = document.createElement("button");
+    btn.className = "option";
+    btn.textContent = label;
+    btn.onclick = showFinalTwist;
+    wrap.appendChild(btn);
+  });
+}
+
+function showFinalTwist(){
+  card.classList.add("dimmed");
+  finalOverlay.classList.add("show");
+
+  setTimeout(() => {
+    finalOverlay.classList.remove("show");
+    card.classList.remove("dimmed");
+    renderStart();
+  }, 2800);
+}
+
+// ============ INÍCIO ============
+renderStart();
+</script>
+
+</body>
+</html>
