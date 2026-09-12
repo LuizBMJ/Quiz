@@ -316,7 +316,7 @@
 </div>
 
 <div class="jumpscare-overlay" id="jumpscareOverlay">
-  <img src="assets/ghost.gif" class="ghost-slot" id="ghostSlot" alt="">
+  <img src="ghost.gif" class="ghost-slot" id="ghostSlot" alt="">
 </div>
 
 <div class="final-overlay" id="finalOverlay">
@@ -324,7 +324,7 @@
 </div>
 
 <audio id="screamAudio" preload="auto">
-  <source src="assets/scream.mp3" type="audio/mpeg">
+  <source src="scream.mp3" type="audio/mpeg">
 </audio>
 
 <script>
@@ -396,6 +396,35 @@ const jumpscareOverlay = document.getElementById("jumpscareOverlay");
 const finalOverlay = document.getElementById("finalOverlay");
 const screamAudio = document.getElementById("screamAudio");
 
+// Função auxiliar para tocar áudio com tratamento de erro
+function playAudio() {
+  if (screamAudio) {
+    try {
+      screamAudio.currentTime = 0;
+      const playPromise = screamAudio.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(err => {
+          console.log("Autoplay bloqueado pelo navegador:", err);
+        });
+      }
+    } catch (e) {
+      console.log("Erro ao tocar áudio:", e);
+    }
+  }
+}
+
+// Função auxiliar para parar áudio
+function stopAudio() {
+  if (screamAudio) {
+    try {
+      screamAudio.pause();
+      screamAudio.currentTime = 0;
+    } catch (e) {
+      console.log("Erro ao pausar áudio:", e);
+    }
+  }
+}
+
 // ============ TELA INICIAL ============
 function renderStart(){
   card.innerHTML = `
@@ -461,11 +490,11 @@ function handleAnswer(idx, btnEl, q){
 
 function triggerJumpscare(q){
   jumpscareOverlay.classList.add("show");
-  try { screamAudio.currentTime = 0; screamAudio.play().catch(()=>{}); } catch(e){}
+  playAudio();
 
   setTimeout(() => {
     jumpscareOverlay.classList.remove("show");
-    try { screamAudio.pause(); screamAudio.currentTime = 0; } catch(e){}
+    stopAudio();
     renderQuestion(); // volta pra mesma pergunta (currentIndex não mudou)
   }, 3000);
 }
